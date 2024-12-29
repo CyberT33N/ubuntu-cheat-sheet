@@ -28,6 +28,22 @@ ____________________________________________
   - https://wiki.ubuntuusers.de/Grafikkarten/Nvidia/nvidia/
 
 
+
+
+<br><br>
+
+### Uninstall
+```shell
+sudo apt remove --purge '^nvidia-.*'
+sudo apt autoremove --purge
+```
+
+
+
+
+
+
+<br><br>
 <br><br>
 
 ### Install / Update
