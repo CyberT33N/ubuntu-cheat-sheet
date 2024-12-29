@@ -3,6 +3,158 @@ Ubuntu Cheat Sheet with the most needed stuff..
 
 
 
+
+
+
+
+
+
+
+
+
+
+<br><br>
+____________________________________________
+____________________________________________
+<br><br>
+
+# Nvidia
+
+<br><br>
+
+
+## Driver
+- You can find a list of nvidia driver here and check there if your graphiccard is supported
+  - https://wiki.ubuntuusers.de/Grafikkarten/Nvidia/nvidia/
+
+
+<br><br>
+
+### Install / Update
+
+<br><br>
+
+#### Method 1
+- You should install nvidia driver via the GUI
+  - https://www.linuxbabe.com/ubuntu/install-nvidia-driver-ubuntu
+
+<br><br>
+
+#### Method 2 (recommended)
+- https://ubuntu.com/server/docs/nvidia-drivers-installation
+  
+```shell
+sudo ubuntu-drivers list
+sudo ubuntu-drivers install nvidia:550
+sudo reboot
+```
+- You can do the same for updating :) 
+
+
+
+
+<br><br>
+
+#### Check if new driver version is available
+```shell
+# Get current driver
+nvidia-smi
+
+# Check if driver update is available
+ubuntu-drivers devices
+```
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br>
+<br><br>
+
+### Suspend not working anymore
+- If you suspend and it directly wake up after it then try:
+```
+sudo systemctl stop nvidia-suspend.service
+sudo systemctl stop nvidia-hibernate.service
+sudo systemctl stop nvidia-resume.service
+
+sudo systemctl disable nvidia-suspend.service
+sudo systemctl disable nvidia-hibernate.service
+sudo systemctl disable nvidia-resume.service
+
+sudo rm /lib/systemd/system-sleep/nvidia
+```
+
+
+
+
+
+
+
+
+## Cuda & cuDNN
+
+### Install
+
+#### Ubuntu 23.04
+- Install first latest nvidia driver (https://github.com/CyberT33N/linux-cheat-sheet/blob/main/README.md#nvidia)
+```shell
+sudo apt update
+sudo apt install build-essential
+
+# check if it worked
+gcc --version
+g++ --version
+
+sudo apt install nvidia-cuda-toolkit nvidia-cuda-toolkit-gcc nvidia-cudnn
+
+# Check if it worked
+nvcc --version
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<br><br>
+_______________
+_______________
+<br><br>
+
+
 ## Kernel
 
 ### ubuntu 24.04
