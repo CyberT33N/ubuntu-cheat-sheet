@@ -8,6 +8,22 @@ Ubuntu Cheat Sheet with the most needed stuff..
 
 
 
+<br><br>
+____________________________________________
+____________________________________________
+<br><br>
+
+# Terminal
+
+## Konsole
+
+### Select and copy with mouse click
+- Man kann auf Settings gehen, dann auf Edit Current Profile und anschließend auf Maus. Dort kann man "Copy on Select" auswählen.
+
+Dadurch hat man die Möglichkeit, Text einfach mit der linken Maustaste auszuwählen und direkt zu kopieren. Standardmäßig kann man das nicht wie bei Windows machen, also nicht mit der rechten Maustaste kopieren, was theoretisch sogar ein zusätzlicher Schritt wäre.
+
+Einfügen kann man mit der mittleren Maustaste. Ich habe erstmal keine Möglichkeit gefunden, das auf die rechte Maustaste umzustellen.
+
 
 
 
