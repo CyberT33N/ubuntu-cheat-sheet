@@ -5,6 +5,21 @@ Ubuntu Cheat Sheet with the most needed stuff..
 
 
 
+<br><br>
+<br><br>
+
+# Update
+```
+sudo apt update
+sudo apt full-upgrade -y
+sudo apt autoremove --purge -y
+sudo apt autoclean
+
+sudo reboot
+```
+
+
+
 
 
 
