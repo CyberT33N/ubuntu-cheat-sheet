@@ -78,6 +78,7 @@ sudo apt autoremove --purge
 <br><br>
 
 ### Install / Update
+- Wird nicht automatisch geupdated auf breaking changes bei normalen ubuntu update/upgrade. Man muss selber das unten machen
 
 <br><br>
 
@@ -92,7 +93,7 @@ sudo apt autoremove --purge
   
 ```shell
 sudo ubuntu-drivers list
-sudo ubuntu-drivers install nvidia:550
+sudo ubuntu-drivers install nvidia:590
 sudo reboot
 ```
 - You can do the same for updating :) 
