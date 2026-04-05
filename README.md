@@ -11,8 +11,8 @@ Ubuntu Cheat Sheet with the most needed stuff..
 # Update
 ```
 sudo apt update
-sudo apt full-upgrade -y
-sudo apt autoremove --purge -y
+sudo apt full-upgrade
+sudo apt autoremove --purge
 sudo apt autoclean
 
 sudo reboot
