@@ -280,8 +280,10 @@ sudo apt upgrade
 ### Dist Upgrade
 ```
 sudo apt update
-sudo apt upgrade
-sudo apt dist-upgrade
+sudo apt full-upgrade
+
+sudo reboot
+
 sudo do-release-upgrade
 ```
 
