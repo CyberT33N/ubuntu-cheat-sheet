@@ -287,8 +287,18 @@ sudo reboot
 sudo do-release-upgrade
 ```
 
+#### Upgrade to higher non lts
+```shell
+sudo gedit /etc/update-manager/release-upgrades
 
-#### Upgrade 22 to 23
+# set
+# Prompt=normal
+```
+
+
+#### 24.10 to 25.10
+
+#### 22 to 23
 - Try first the default dist upgrade method explained above and if it not working like you get an error hat upgrade is not supported then try this.
 - Works aswell for 23 to 24
 - Make sure that while the install process when it will ask you to update grub that you keep the local version instead by replacing it with a new one. This is necesarry when you have custom boot options with grub like e.g. disk encrytption. Everything else is straight forward and can be just be confirmed all the time with yes.
