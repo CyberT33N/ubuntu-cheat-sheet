@@ -1,6 +1,31 @@
 # ubuntu-cheat-sheet
 Ubuntu Cheat Sheet with the most needed stuff..
 
+# USB
+
+## Bootable
+
+
+Terminal:
+
+```bash
+sudo apt update
+sudo apt install isoimagewriter
+```
+
+Dann:
+
+```bash
+isoimagewriter
+```
+
+Wenn Checksum Fehler kommen einfach weiter
+
+
+
+
+
+
 
 
 
