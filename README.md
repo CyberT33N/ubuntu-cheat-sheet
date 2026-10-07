@@ -30,6 +30,337 @@ Wenn Checksum Fehler kommen einfach weiter
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Secure Erase
+
+## NVMe
+
+### Variante: Ubuntu-Live-USB → NVMe löschen
+
+Ubuntu auf USB Stick installieren und dann Try Ubuntu
+
+
+  # NVMe Secure Erase – Ubuntu Live
+   
+  > **Ziel:** NVMe-SSD vollständig über den NVMe-Sanitize-Mechanismus löschen. **Beispiel-Platzhalter:** \- Controller: `/dev/nvmeX` \- Namespace: `/dev/nvmeXn1` \- Modell: `MODEL_PLACEHOLDER` \- Seriennummer: `SERIAL_PLACEHOLDER`
+   
+  ## 0\. ⚠️ WARNUNG
+   
+  Der Vorgang löscht die Ziel-SSD.
+   
+  **Vor dem Löschen IMMER Modell + Seriennummer + Device prüfen.**
+   
+  ---
+   
+  ## 1\. SSD identifizieren
+   
+  ```
+  sudo nvme list
+  ```
+   
+  Beispiel:
+   
+  ```
+  Node         Generic      SN                 Model
+  /dev/nvmeXn1 /dev/ngXn1   SERIAL_PLACEHOLDER  MODEL_PLACEHOLDER
+  ```
+   
+  Merke dir:
+   
+  ```
+  Controller: /dev/nvmeX
+  Namespace:  /dev/nvmeXn1
+  ```
+   
+  ---
+   
+  ## 2\. Controller-Informationen prüfen
+   
+  ```
+  sudo nvme id-ctrl /dev/nvmeX | grep -E 'mn|sn|fr|sanicap'
+  ```
+   
+  Kontrollieren:
+   
+  ```
+  mn        : MODEL_PLACEHOLDER
+  sn        : SERIAL_PLACEHOLDER
+  sanicap   : ...
+  ```
+   
+  ---
+   
+  ## 3\. Blockgerät mit Mountpoints prüfen
+   
+  ```
+  lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS
+  ```
+   
+  Die Ziel-NVMe darf **nicht** das laufende Ubuntu-Live-System enthalten.
+   
+  Außerdem sollte die Ziel-SSD keine gemounteten Partitionen haben.
+   
+  Prüfen:
+   
+  ```
+  mount | grep nvmeX
+  ```
+   
+  Wenn dort Partitionen der Ziel-SSD erscheinen, diese vor dem Sanitize aushängen:
+   
+  ```
+  sudo umount /dev/nvmeXn1p1
+  ```
+   
+  Bei mehreren Partitionen entsprechend wiederholen.
+   
+  ---
+   
+  ## 4\. Sanitize-Fähigkeiten prüfen
+   
+  ```
+  sudo nvme id-ctrl /dev/nvmeX | grep -i sanicap
+  ```
+   
+  Beispiel:
+   
+  ```
+  sanicap : 0x60000002
+  ```
+   
+  **Nicht einfach davon ausgehen, dass jede NVMe dieselben Fähigkeiten besitzt.**
+   
+  Zusätzlich:
+   
+  ```
+  sudo nvme sanitize-log -H /dev/nvmeX
+  ```
+   
+  Vor dem Start sollte typischerweise stehen:
+   
+  ```
+  Sanitize State : 0  Idle state
+  ```
+   
+  und es darf kein laufender Sanitize-Vorgang vorhanden sein.
+   
+  ---
+   
+  ## 5\. Unterstützte Sanitize-Methode bestimmen
+   
+  ```
+  sudo nvme id-ctrl /dev/nvmeX | grep -i sanicap
+  ```
+   
+  Die konkreten unterstützten Methoden hängen vom Controller ab.
+   
+  Für eine SSD, die **Block Erase** unterstützt:
+   
+  ```
+  Block Erase = supported
+  ```
+   
+  ist der entsprechende Sanitize-Befehl:
+   
+  ```
+  sudo nvme sanitize /dev/nvmeX -a 2
+  ```
+   
+  `-a 2` = **Block Erase Sanitize**
+   
+  ---
+   
+  # 6\. 🚨 LETZTE KONTROLLE VOR DEM LÖSCHEN
+   
+  Noch einmal:
+   
+  ```
+  sudo nvme list
+  ```
+   
+  und:
+   
+  ```
+  lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS
+  ```
+   
+  Vergleiche:
+   
+  ```
+  MODEL:  MODEL_PLACEHOLDER
+  SERIAL: SERIAL_PLACEHOLDER
+  ```
+   
+  **Erst wenn Modell und Seriennummer eindeutig stimmen, fortfahren.**
+   
+  ---
+   
+  # 7\. SANITIZE AUSFÜHREN
+   
+  ```
+  sudo nvme sanitize /dev/nvmeX -a 2
+  ```
+   
+  Dabei wird der **Controller** verwendet:
+   
+  ```
+  /dev/nvmeX
+  ```
+   
+  nicht:
+   
+  ```
+  /dev/nvmeXn1
+  ```
+   
+  Der Vorgang kann im Hintergrund laufen.
+   
+  **Währenddessen:**
+   
+  - SSD nicht entfernen
+  - Rechner nicht ausschalten
+  - Vorgang nicht unterbrechen
+   
+  ---
+   
+  # 8\. Status prüfen
+   
+  ```
+  sudo nvme sanitize-log -H /dev/nvmeX
+  ```
+   
+  Während des Vorgangs kann der Status auf laufenden Betrieb hinweisen.
+   
+  Wiederholen:
+   
+  ```
+  sudo nvme sanitize-log -H /dev/nvmeX
+  ```
+   
+  bis der Vorgang abgeschlossen ist.
+   
+  ---
+   
+  # 9\. Erfolgreichen Abschluss verifizieren
+   
+  Erfolgreich ist es, wenn der Status sinngemäß meldet:
+   
+  ```
+  Most Recent Sanitize Command Completed Successfully.
+  ```
+   
+  und:
+   
+  ```
+  Sanitize State : 0  Idle state
+  ```
+   
+  Bei einem erfolgreichen Sanitize sollte außerdem der entsprechende Global-Data-Erased-Status gemäß Controller-Ausgabe geprüft werden.
+   
+  ---
+   
+  # 10\. Nachkontrolle
+   
+  ```
+  sudo nvme list
+  ```
+   
+  und:
+   
+  ```
+  lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS
+  ```
+   
+  Die alte Partitionierung/Dateisystemstruktur sollte nicht mehr als nutzbare alte Installation vorhanden sein.
+   
+  ---
+   
+  # Kurzversion
+   
+  ```
+  # 1. SSD identifizieren
+  sudo nvme list
+   
+  # 2. Controller prüfen
+  sudo nvme id-ctrl /dev/nvmeX | grep -E 'mn|sn|fr|sanicap'
+   
+  # 3. Blockgerät prüfen
+  lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS
+   
+  # 4. Mounts prüfen
+  mount | grep nvmeX
+   
+  # 5. Sanitize-Fähigkeiten/Status prüfen
+  sudo nvme sanitize-log -H /dev/nvmeX
+   
+  # 6. NUR wenn Block Erase unterstützt wird:
+  sudo nvme sanitize /dev/nvmeX -a 2
+   
+  # 7. Ergebnis prüfen
+  sudo nvme sanitize-log -H /dev/nvmeX
+   
+  # 8. Abschlusskontrolle
+  sudo nvme list
+  lsblk -o NAME,SIZE,MODEL,SERIAL,FSTYPE,MOUNTPOINTS
+  ```
+   
+  ## Wichtig
+   
+  **`nvmeX`****und****`nvmeXn1`****sind Platzhalter.**
+   
+  Beispielsweise könnte eine echte SSD sein:
+   
+  ```
+  Controller: /dev/nvme0
+  Namespace:  /dev/nvme0n1
+  ```
+   
+  Eine andere Maschine könnte aber haben:
+   
+  ```
+  Controller: /dev/nvme1
+  Namespace:  /dev/nvme1n1
+  ```
+   
+  **Niemals die Device-Namen blind aus diesem Cheat Sheet übernehmen. Immer zuerst mit****`nvme list`****und****`lsblk`****identifizieren.** :::
+   
+  Wenn du möchtest, kann ich dir auch noch eine **ultrakompakte 10-Zeilen-Version** für einen USB-Stick/Notfall-Cheat-Sheet machen.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <br><br>
 <br><br>
 
